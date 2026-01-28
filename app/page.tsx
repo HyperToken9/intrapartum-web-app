@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Open_Sans, Roboto_Condensed } from "next/font/google"; // Font loading
 
 // Components
-import { NumericInput } from "@/components/NumericInput";
-import { FormLabel } from "@/components/FormLabel";
-import { Processing } from "@/lib/processing";
+import { IntrapartumForm } from "@/components/IntrapartumForm";
+import { ManipalForm } from "@/components/ManipalForm";
+import { IntrapartumModel } from "@/models/IntrapartumModel";
+import { ManipalModel } from "@/models/ManipalModel";
 
 // Font Configuration to match Flutter
 const openSans = Open_Sans({
@@ -21,9 +21,10 @@ const openSansCondensed = Roboto_Condensed({
 
 export default function IntrapartumApp() {
   // --- State ---
+  const [selectedModel, setSelectedModel] = useState("intrapartum");
   const [result, setResult] = useState<number | null>(null);
 
-  // Form Values
+  // Intrapartum Model Form Values
   const [maternalAge, setMaternalAge] = useState(30);
   const [maternalBmi, setMaternalBmi] = useState(25.0);
   const [gestation, setGestation] = useState(40);
@@ -36,27 +37,60 @@ export default function IntrapartumApp() {
   const [headDistance, setHeadDistance] = useState(40);
   const [caput, setCaput] = useState(10);
 
+  // Manipal Model Form Values
+  const [maniAgeMaternal, setManiAgeMaternal] = useState(28);
+  const [maniHeadPerineumDistance, setManiHeadPerineumDistance] = useState(42);
+  const [maniAngleOfProgression, setManiAngleOfProgression] = useState(110);
+  const [maniCaput, setManiCaput] = useState(10);
+  const [maniPositionDir, setManiPositionDir] = useState("Left");
+  const [maniPositionOrient, setManiPositionOrient] = useState("Posterior");
+  const [maniProlongedLabor, setManiProlongedLabor] = useState(false);
+
   const topRef = useRef<HTMLDivElement>(null);
 
   // --- Handlers ---
 
   const handleCalculate = () => {
-    // Format Occiput: Left + Anterior -> LOA
-    const formattedOcciput =
-      `${occiputDir[0]}O${occiputOrient[0]}`.toUpperCase();
+    if (selectedModel === "intrapartum") {
+      // Format Occiput: Left + Anterior -> LOA
+      const formattedOcciput =
+        `${occiputDir[0]}O${occiputOrient[0]}`.toUpperCase();
 
-    const prob = Processing.predictRisk({
-      gestationWeeks: gestation,
-      cervicalDilationCm: dilation,
-      caputSuccedaneumMm: caput,
-      headPerineumDistanceMm: headDistance,
-      occiputPosition: formattedOcciput,
-      maternalAgeYears: maternalAge,
-      maternalBmi: maternalBmi,
-      prolongedLabor: prolongedLabor,
-    });
+      const prob = IntrapartumModel.predictRisk({
+        gestationWeeks: gestation,
+        cervicalDilationCm: dilation,
+        caputSuccedaneumMm: caput,
+        headPerineumDistanceMm: headDistance,
+        occiputPosition: formattedOcciput,
+        maternalAgeYears: maternalAge,
+        maternalBmi: maternalBmi,
+        prolongedLabor: prolongedLabor,
+      });
 
-    setResult(prob);
+      setResult(prob);
+    } else if (selectedModel === "manipal") {
+      // Format Position: Left + Posterior -> LOP (same as Intrapartum)
+      const formattedPosition =
+        `${maniPositionDir[0]}O${maniPositionOrient[0]}`.toUpperCase();
+
+      // Check if position is ROP or LOP
+      const binaryPosition =
+        formattedPosition === "ROP" || formattedPosition === "LOP" ? 1 : 0;
+
+      // Caput is binary: 1 if >= 10mm, 0 otherwise
+      const caputBinary = maniCaput >= 10 ? 1 : 0;
+
+      const prob = ManipalModel.predictRisk({
+        maternalAgeYears: maniAgeMaternal,
+        headPerineumDistanceCm: maniHeadPerineumDistance / 10, // Convert mm to cm
+        angleOfProgressionDegrees: maniAngleOfProgression,
+        isCaput: caputBinary,
+        binaryPosition: binaryPosition,
+        hasProlongedLabor: maniProlongedLabor,
+      });
+
+      setResult(prob);
+    }
 
     // Smooth scroll to top
     setTimeout(() => {
@@ -74,11 +108,21 @@ export default function IntrapartumApp() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#FFF9F9]/90 backdrop-blur-sm px-6 py-4 shadow-sm">
         <div className="mx-auto max-w-3xl">
-          <h1
-            className={`${openSansCondensed.className} text-3xl font-bold text-[#1D1936]`}
-          >
-            INTRAPARTUM
-          </h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h1
+              className={`${openSansCondensed.className} text-3xl font-bold text-[#1D1936]`}
+            >
+              INTRAPARTUM
+            </h1>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="h-10 rounded border-2 border-black bg-white px-3 font-bold text-sm text-[#1D1936] uppercase transition-colors hover:bg-[#F7E7EF]"
+            >
+              <option value="intrapartum">Intrapartum Model</option>
+              <option value="manipal">Manipal Model</option>
+            </select>
+          </div>
         </div>
       </header>
 
@@ -87,209 +131,53 @@ export default function IntrapartumApp() {
           Single Assessment
         </h2>
 
-        {/* Results Section (Animated) */}
-        <AnimatePresence>
-          {result !== null && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="mb-8 flex flex-col items-center justify-center rounded-2xl bg-white p-8 shadow-md ring-1 ring-black/5">
-                {/* Progress Bar Visual */}
-                <div className="relative mb-6 h-4 w-full max-w-xs overflow-hidden rounded-full bg-gray-200">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${result}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full bg-[#B8AAFF]"
-                  />
-                </div>
+        {selectedModel === "intrapartum" && (
+          <IntrapartumForm
+            result={result}
+            maternalAge={maternalAge}
+            setMaternalAge={setMaternalAge}
+            maternalBmi={maternalBmi}
+            setMaternalBmi={setMaternalBmi}
+            gestation={gestation}
+            setGestation={setGestation}
+            prolongedLabor={prolongedLabor}
+            setProlongedLabor={setProlongedLabor}
+            occiputDir={occiputDir}
+            setOcciputDir={setOcciputDir}
+            occiputOrient={occiputOrient}
+            setOcciputOrient={setOcciputOrient}
+            dilation={dilation}
+            setDilation={setDilation}
+            headDistance={headDistance}
+            setHeadDistance={setHeadDistance}
+            caput={caput}
+            setCaput={setCaput}
+            onCalculate={handleCalculate}
+            onClear={handleClear}
+          />
+        )}
 
-                <div className="text-center">
-                  <span
-                    className={`${openSansCondensed.className} text-6xl font-bold text-[#1D1936]`}
-                  >
-                    {result.toFixed(2)}
-                  </span>
-                  <span
-                    className={`${openSansCondensed.className} text-4xl font-bold text-[#1D1936]`}
-                  >
-                    %
-                  </span>
-                  <p
-                    className={`${openSansCondensed.className} mt-2 text-sm font-semibold uppercase tracking-wider text-[#1D1936]`}
-                  >
-                    Probability of Vaginal Birth
-                  </p>
-                  <p
-                    className={`${openSansCondensed.className} mt-4 text-3xl font-bold uppercase text-[#1D1936]`}
-                  >
-                    {Processing.getRiskLabel(result)}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Form Container */}
-        <div className="rounded-xl border-2 border-black bg-[#F7E7EF] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          {/* Grid for Desktop / Flex col for Mobile */}
-          <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
-            {/* Column 1 */}
-            <div>
-              <FormLabel
-                label="Maternal Age"
-                unit="years"
-                info={["Age of mother at time of labor."]}
-              />
-              <NumericInput
-                value={maternalAge}
-                onChange={setMaternalAge}
-                min={10}
-                max={55}
-              />
-
-              <FormLabel
-                label="Maternal BMI"
-                info={["Weight (kg) / Height (m)²"]}
-              />
-              <NumericInput
-                value={maternalBmi}
-                onChange={setMaternalBmi}
-                min={17}
-                max={40}
-                isInteger={false}
-              />
-
-              <FormLabel
-                label="Gestation"
-                unit="weeks"
-                info={["Length of pregnancy."]}
-              />
-              <NumericInput
-                value={gestation}
-                onChange={setGestation}
-                min={30}
-                max={45}
-              />
-            </div>
-
-            {/* Column 2 */}
-            <div>
-              <FormLabel
-                label="Prolonged Labour"
-                info={[
-                  "Labor lasting longer than usual (>20h first-time, >14h others).",
-                ]}
-              />
-              <div className="flex gap-4">
-                {/* Yes/No Toggle Custom Buttons */}
-                <button
-                  onClick={() => setProlongedLabor(true)}
-                  className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors ${
-                    prolongedLabor ? "bg-[#D0C8FF]" : "bg-white"
-                  }`}
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={() => setProlongedLabor(false)}
-                  className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors ${
-                    !prolongedLabor ? "bg-[#D0C8FF]" : "bg-white"
-                  }`}
-                >
-                  No
-                </button>
-              </div>
-
-              <FormLabel
-                label="Occiput Position"
-                info={[
-                  "Position of baby's head.",
-                  "Anterior (front), Posterior (back), Transverse (side).",
-                ]}
-              />
-              <div className="flex gap-2">
-                <select
-                  className="h-12 flex-1 rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936]"
-                  value={occiputDir}
-                  onChange={(e) => setOcciputDir(e.target.value)}
-                >
-                  <option value="Left">LEFT</option>
-                  <option value="Right">RIGHT</option>
-                </select>
-                <select
-                  className="h-12 flex-[1.5] rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936]"
-                  value={occiputOrient}
-                  onChange={(e) => setOcciputOrient(e.target.value)}
-                >
-                  <option value="Anterior">ANTERIOR</option>
-                  <option value="Posterior">POSTERIOR</option>
-                  <option value="Transverse">TRANSVERSE</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Full Width Section below grid */}
-          <div className="mt-2 grid grid-cols-1 gap-x-8 md:grid-cols-2">
-            <div>
-              <FormLabel
-                label="Cervical Dilation"
-                unit="cm"
-                info={["Opening of cervix (Max 10cm)."]}
-              />
-              <NumericInput
-                value={dilation}
-                onChange={setDilation}
-                min={0}
-                max={10}
-                isInteger={false}
-              />
-            </div>
-            <div>
-              <FormLabel
-                label="Head Perineum Dist."
-                unit="mm"
-                info={["Distance between head and perineum."]}
-              />
-              <NumericInput
-                value={headDistance}
-                onChange={setHeadDistance}
-                min={0}
-                max={100}
-              />
-            </div>
-          </div>
-
-          <div className="md:w-1/2 md:pr-4">
-            <FormLabel
-              label="Caput Succedaneum"
-              unit="mm"
-              info={["Swelling on baby's head."]}
-            />
-            <NumericInput value={caput} onChange={setCaput} min={0} max={75} />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-10 flex gap-4">
-            <button
-              onClick={handleClear}
-              className="flex-1 rounded border border-black bg-white py-3 text-lg font-bold uppercase text-[#1D1936] transition-transform active:scale-95"
-            >
-              Clear
-            </button>
-            <button
-              onClick={handleCalculate}
-              className="flex-1 rounded border border-black bg-[#B8AAFF] py-3 text-lg font-bold uppercase text-[#1D1936] shadow-md transition-transform active:scale-95"
-            >
-              Calculate
-            </button>
-          </div>
-        </div>
+        {selectedModel === "manipal" && (
+          <ManipalForm
+            result={result}
+            maternalAge={maniAgeMaternal}
+            setMaternalAge={setManiAgeMaternal}
+            headPerineumDistance={maniHeadPerineumDistance}
+            setHeadPerineumDistance={setManiHeadPerineumDistance}
+            angleOfProgression={maniAngleOfProgression}
+            setAngleOfProgression={setManiAngleOfProgression}
+            caput={maniCaput}
+            setCaput={setManiCaput}
+            positionDir={maniPositionDir}
+            setPositionDir={setManiPositionDir}
+            positionOrient={maniPositionOrient}
+            setPositionOrient={setManiPositionOrient}
+            prolongedLabor={maniProlongedLabor}
+            setProlongedLabor={setManiProlongedLabor}
+            onCalculate={handleCalculate}
+            onClear={handleClear}
+          />
+        )}
       </div>
     </main>
   );

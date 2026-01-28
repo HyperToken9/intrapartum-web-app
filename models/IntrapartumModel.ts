@@ -1,6 +1,6 @@
-// lib/processing.ts
+// models/IntrapartumeModel.ts
 
-export const Processing = {
+export const IntrapartumModel = {
   predictRisk: ({
     gestationWeeks,
     cervicalDilationCm,
