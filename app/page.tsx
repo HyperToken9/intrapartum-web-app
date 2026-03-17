@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { Open_Sans, Roboto_Condensed } from "next/font/google"; // Font loading
+import Image from "next/image";
 
 // Components
 import { ManipalForm } from "@/components/ManipalForm";
@@ -75,7 +76,9 @@ export default function IntrapartumApp() {
   };
 
   return (
-    <main className={`min-h-screen bg-[#FFF9F9] ${openSans.className} pb-20`}>
+    <main
+      className={`min-h-screen flex flex-col bg-[#FFF9F9] ${openSans.className}`}
+    >
       {/* Header */}
       <header className="sticky top-0 z-10 bg-[#FFF9F9]/90 backdrop-blur-sm px-6 py-4 shadow-sm">
         <div className="mx-auto max-w-3xl">
@@ -89,7 +92,7 @@ export default function IntrapartumApp() {
         </div>
       </header>
 
-      <div ref={topRef} className="mx-auto max-w-3xl px-5 pt-6">
+      <div ref={topRef} className="mx-auto max-w-3xl px-5 pt-6 flex-grow pb-16">
         <h2 className="mb-6 text-xl font-semibold uppercase tracking-wide text-[#09000A]">
           Single Assessment
         </h2>
@@ -120,6 +123,23 @@ export default function IntrapartumApp() {
           onClear={handleClear}
         />
       </div>
+
+      {/* Footer */}
+      <footer className="mt-auto bg-[#000000] py-8">
+        <div className="mx-auto max-w-3xl px-5 flex flex-row items-center justify-end gap-6 sm:gap-8">
+          <p className="text-sm font-semibold tracking-widest text-white/80 uppercase hover:text-white transition-colors duration-300">
+            A Manipal Initiative
+          </p>
+          <Image
+            src="/Manipal_University_logo.png"
+            alt="Manipal Logo"
+            width={120}
+            height={60}
+            className="object-contain brightness-0 invert opacity-100"
+            priority
+          />
+        </div>
+      </footer>
     </main>
   );
 }
