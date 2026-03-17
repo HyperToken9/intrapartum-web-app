@@ -1,9 +1,12 @@
 export const ManipalModel = {
   /**
-   * Predicts the probability of C-SECTION (Risk).
+   * Predicts the probability of vaginal delivery.
    * Returns a percentage (0-100).
    */
   predictRisk: ({
+    maternalBmi,
+    cervicalDilationCm,
+    gestationalAgeWeeks,
     maternalAgeYears,
     headPerineumDistanceCm,
     angleOfProgressionDegrees,
@@ -11,43 +14,53 @@ export const ManipalModel = {
     binaryPosition,
     hasProlongedLabor,
   }: {
+    maternalBmi: number;
+    cervicalDilationCm: number;
+    gestationalAgeWeeks: number;
     maternalAgeYears: number;
     headPerineumDistanceCm: number;
     angleOfProgressionDegrees: number;
-    isCaput: number; // 0 or 1
-    binaryPosition: number; // 0 or 1
-    hasProlongedLabor: boolean;
+    isCaput: number;
+    binaryPosition: number;
+    hasProlongedLabor: number;
   }): number => {
     // 1. Initialize Z-Score with the Model Intercept
-    let zScore = -0.40593;
+    let zScore = 0.576705;
 
     // 2. Add impact of each feature (Standardized & Weighted)
+    // maternal_bmi
+    zScore += ((maternalBmi - 22.785833) / 3.839733) * -0.040886;
+
+    // cervical_dilation_cm
+    zScore += ((cervicalDilationCm - 5.416667) / 1.069138) * -0.76988;
+
+    // gestational_age_weeks
+    zScore += ((gestationalAgeWeeks - 38.66025) / 0.885959) * -0.14814;
+
     // maternal_age_years
-    zScore += ((maternalAgeYears - 28.97479) / 3.50621) * 0.40108;
+    zScore += ((maternalAgeYears - 28.983333) / 3.49281) * -0.104569;
 
     // head_perineum_distance_cm
-    zScore += ((headPerineumDistanceCm - 4.1916) / 0.88723) * 0.66478;
+    zScore += ((headPerineumDistanceCm - 3.972667) / 0.93999) * -1.622305;
 
     // angle_of_progression_degrees
-    zScore += ((angleOfProgressionDegrees - 110.84034) / 13.41389) * -0.48739;
+    zScore += ((angleOfProgressionDegrees - 113.041667) / 13.435274) * 1.143241;
 
     // is_caput
-    zScore += ((isCaput - 0.30252) / 0.45935) * 0.45071;
+    zScore += ((isCaput - 0.308333) / 0.461805) * -0.144293;
 
     // binary_position
-    zScore += ((binaryPosition - 0.13445) / 0.34114) * 1.06755;
+    zScore += ((binaryPosition - 0.133333) / 0.339935) * -0.955437;
 
     // has_prolonged_labor
-    zScore += (((hasProlongedLabor ? 1 : 0) - 0.33613) / 0.47239) * 0.77227;
+    zScore += ((hasProlongedLabor - 0.341667) / 0.474268) * -0.523206;
 
     // 3. Sigmoid Function (Log-Odds -> Probability)
-    // Returns probability of Class 1 (C-Section)
-    const probabilityCSection = 1 / (1 + Math.exp(-zScore));
+    // Returns probability of vaginal delivery
+    const probability = 1 / (1 + Math.exp(-zScore));
 
-    // Convert to probability of vaginal delivery (inverse)
-    const probabilityVaginalDelivery = (1 - probabilityCSection) * 100;
-
-    return probabilityVaginalDelivery;
+    // Convert to percentage
+    return probability * 100;
   },
 
   getRiskLabel: (percentage: number): string => {

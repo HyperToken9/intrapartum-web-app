@@ -18,6 +18,12 @@ interface ManipalFormProps {
   result: number | null;
   maternalAge: number;
   setMaternalAge: (value: number) => void;
+  maternalBmi: number;
+  setMaternalBmi: (value: number) => void;
+  cervicalDilation: number;
+  setCervicalDilation: (value: number) => void;
+  gestationalAge: number;
+  setGestationalAge: (value: number) => void;
   headPerineumDistance: number;
   setHeadPerineumDistance: (value: number) => void;
   angleOfProgression: number;
@@ -38,6 +44,12 @@ export function ManipalForm({
   result,
   maternalAge,
   setMaternalAge,
+  maternalBmi,
+  setMaternalBmi,
+  cervicalDilation,
+  setCervicalDilation,
+  gestationalAge,
+  setGestationalAge,
   headPerineumDistance,
   setHeadPerineumDistance,
   angleOfProgression,
@@ -107,9 +119,8 @@ export function ManipalForm({
       {/* Form Container */}
       <div className="rounded-xl border-2 border-black bg-[#F7E7EF] p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         {/* Grid for Desktop / Flex col for Mobile */}
-        <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
-          {/* Column 1 */}
-          <div>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+          <div className="flex flex-col">
             <FormLabel
               label="Maternal Age"
               unit="years"
@@ -121,7 +132,53 @@ export function ManipalForm({
               min={10}
               max={55}
             />
+          </div>
 
+          <div className="flex flex-col">
+            <FormLabel
+              label="Maternal BMI"
+              unit=""
+              info={["Body Mass Index of the mother."]}
+            />
+            <NumericInput
+              value={maternalBmi}
+              onChange={setMaternalBmi}
+              min={15}
+              max={50}
+              isInteger={false}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <FormLabel
+              label="Gestational Age"
+              unit="weeks"
+              info={["Gestational age in weeks."]}
+            />
+            <NumericInput
+              value={gestationalAge}
+              onChange={setGestationalAge}
+              min={20}
+              max={42}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <FormLabel
+              label="Cervical Dilation"
+              unit="cm"
+              info={["Cervical dilation in centimeters."]}
+            />
+            <NumericInput
+              value={cervicalDilation}
+              onChange={setCervicalDilation}
+              min={0}
+              max={10}
+              isInteger={false}
+            />
+          </div>
+
+          <div className="flex flex-col">
             <FormLabel
               label="Head Perineum Dist."
               unit="mm"
@@ -133,7 +190,9 @@ export function ManipalForm({
               min={0}
               max={100}
             />
+          </div>
 
+          <div className="flex flex-col">
             <FormLabel
               label="Angle of Progression"
               unit="degrees"
@@ -148,34 +207,21 @@ export function ManipalForm({
             />
           </div>
 
-          {/* Column 2 */}
-          <div>
+          <div className="flex flex-col">
             <FormLabel
-              label="Prolonged Labour"
-              info={[
-                "Labor lasting longer than usual (>20h first-time, >14h others).",
-              ]}
+              label="Caput Succedaneum"
+              unit="mm"
+              info={["Swelling on baby's head."]}
             />
-            <div className="flex gap-4">
-              {/* Yes/No Toggle Custom Buttons */}
-              <button
-                onClick={() => setProlongedLabor(true)}
-                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors ${
-                  prolongedLabor ? "bg-[#D0C8FF]" : "bg-white"
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setProlongedLabor(false)}
-                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors ${
-                  !prolongedLabor ? "bg-[#D0C8FF]" : "bg-white"
-                }`}
-              >
-                No
-              </button>
-            </div>
+            <NumericInput
+              value={caput}
+              onChange={setCaput}
+              min={0}
+              max={75}
+            />
+          </div>
 
+          <div className="flex flex-col">
             <FormLabel
               label="Occiput Position"
               info={[
@@ -183,9 +229,9 @@ export function ManipalForm({
                 "ROP (Right Occiput Posterior), LOP (Left Occiput Posterior), or other.",
               ]}
             />
-            <div className="flex gap-2">
+            <div className="flex h-12 gap-2">
               <select
-                className="h-12 flex-1 rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936]"
+                className="h-full flex-1 rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936] focus:border-[#7469B6] focus:outline-none focus:ring-1 focus:ring-[#7469B6]"
                 value={positionDir}
                 onChange={(e) => setPositionDir(e.target.value)}
               >
@@ -193,7 +239,7 @@ export function ManipalForm({
                 <option value="Right">RIGHT</option>
               </select>
               <select
-                className="h-12 flex-[1.5] rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936]"
+                className="h-full flex-[1.5] rounded border border-gray-300 bg-white px-2 font-bold text-[#1D1936] focus:border-[#7469B6] focus:outline-none focus:ring-1 focus:ring-[#7469B6]"
                 value={positionOrient}
                 onChange={(e) => setPositionOrient(e.target.value)}
               >
@@ -203,16 +249,33 @@ export function ManipalForm({
               </select>
             </div>
           </div>
-        </div>
 
-        {/* Full Width Section below grid */}
-        <div className="mt-2 md:w-1/2 md:pr-4">
-          <FormLabel
-            label="Caput Succedaneum"
-            unit="mm"
-            info={["Swelling on baby's head."]}
-          />
-          <NumericInput value={caput} onChange={setCaput} min={0} max={75} />
+          <div className="flex flex-col">
+            <FormLabel
+              label="Prolonged Labour"
+              info={[
+                "Labor lasting longer than usual (>20h first-time, >14h others).",
+              ]}
+            />
+            <div className="flex h-12 gap-4">
+              <button
+                onClick={() => setProlongedLabor(true)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${
+                  prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setProlongedLabor(false)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${
+                  !prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                No
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Action Buttons */}

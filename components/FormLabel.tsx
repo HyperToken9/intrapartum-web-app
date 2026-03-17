@@ -8,7 +8,7 @@ interface FormLabelProps {
 
 export const FormLabel: React.FC<FormLabelProps> = ({ label, unit, info }) => {
   return (
-    <div className="mb-2 mt-4">
+    <div className="mb-2">
       <div className="flex items-baseline gap-2">
         <span className="font-sans text-lg font-bold uppercase text-[#1D1936]">
           {label}
