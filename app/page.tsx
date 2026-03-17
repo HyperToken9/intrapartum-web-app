@@ -92,7 +92,7 @@ export default function IntrapartumApp() {
         </div>
       </header>
 
-      <div ref={topRef} className="mx-auto max-w-3xl px-5 pt-6 flex-grow pb-16">
+      <div ref={topRef} className="mx-auto max-w-3xl px-5 pt-6 flex-grow pb-12">
         <h2 className="mb-6 text-xl font-semibold uppercase tracking-wide text-[#09000A]">
           Single Assessment
         </h2>
@@ -125,18 +125,24 @@ export default function IntrapartumApp() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-auto bg-[#000000] py-8">
-        <div className="mx-auto max-w-3xl px-5 flex flex-row items-center justify-end gap-6 sm:gap-8">
-          <p className="text-sm font-semibold tracking-widest text-white/80 uppercase hover:text-white transition-colors duration-300">
+      <footer className="mt-auto pb-16 bg-transparent">
+        <div className="mx-auto max-w-3xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs sm:text-sm font-bold tracking-[0.2em] text-[#1D1936]/50 uppercase text-center">
             A Manipal Initiative
           </p>
-          <Image
-            src="/Manipal_University_logo.png"
-            alt="Manipal Logo"
-            width={120}
-            height={60}
-            className="object-contain brightness-0 invert opacity-100"
-            priority
+          <div
+            className="w-16 h-16 sm:w-20 sm:h-20 opacity-90 transition-opacity hover:opacity-100"
+            style={{
+              backgroundColor: "#e6571a",
+              maskImage: 'url("/Manipal_University_logo.png")',
+              maskRepeat: "no-repeat",
+              maskPosition: "center right",
+              maskSize: "contain",
+              WebkitMaskImage: 'url("/Manipal_University_logo.png")',
+              WebkitMaskPosition: "center right",
+              WebkitMaskRepeat: "no-repeat",
+              WebkitMaskSize: "contain",
+            }}
           />
         </div>
       </footer>
