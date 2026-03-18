@@ -28,8 +28,8 @@ interface ManipalFormProps {
   setHeadPerineumDistance: (value: number) => void;
   angleOfProgression: number;
   setAngleOfProgression: (value: number) => void;
-  caput: number;
-  setCaput: (value: number) => void;
+  caput: boolean;
+  setCaput: (value: boolean) => void;
   positionDir: string;
   setPositionDir: (value: string) => void;
   positionOrient: string;
@@ -209,16 +209,50 @@ export function ManipalForm({
 
           <div className="flex flex-col">
             <FormLabel
-              label="Caput Succedaneum"
-              unit="mm"
-              info={["Swelling on baby's head."]}
+              label="Is Caput >10mm"
+              info={["Whether caput succedaneum (swelling on baby's head) exceeds 10mm."]}
             />
-            <NumericInput
-              value={caput}
-              onChange={setCaput}
-              min={0}
-              max={75}
+            <div className="flex h-12 gap-4">
+              <button
+                onClick={() => setCaput(true)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${caput ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                  }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setCaput(false)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${!caput ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                  }`}
+              >
+                No
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            <FormLabel
+              label="Prolonged Labour"
+              info={[
+                "Labor lasting longer than usual (>20h first-time, >14h others).",
+              ]}
             />
+            <div className="flex h-12 gap-4">
+              <button
+                onClick={() => setProlongedLabor(true)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                  }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setProlongedLabor(false)}
+                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${!prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
+                  }`}
+              >
+                No
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -250,32 +284,7 @@ export function ManipalForm({
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <FormLabel
-              label="Prolonged Labour"
-              info={[
-                "Labor lasting longer than usual (>20h first-time, >14h others).",
-              ]}
-            />
-            <div className="flex h-12 gap-4">
-              <button
-                onClick={() => setProlongedLabor(true)}
-                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${
-                  prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setProlongedLabor(false)}
-                className={`flex-1 rounded border border-black py-2 text-lg font-bold uppercase transition-colors text-[#1D1936] ${
-                  !prolongedLabor ? "bg-[#D0C8FF] hover:bg-[#B8AAFF]" : "bg-white hover:bg-gray-50"
-                }`}
-              >
-                No
-              </button>
-            </div>
-          </div>
+
         </div>
 
         {/* Action Buttons */}

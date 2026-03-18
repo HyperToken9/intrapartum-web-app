@@ -29,7 +29,7 @@ export default function IntrapartumApp() {
   const [maniGestationalAge, setManiGestationalAge] = useState(38);
   const [maniHeadPerineumDistance, setManiHeadPerineumDistance] = useState(42);
   const [maniAngleOfProgression, setManiAngleOfProgression] = useState(110);
-  const [maniCaput, setManiCaput] = useState(10);
+  const [maniCaput, setManiCaput] = useState(false);
   const [maniPositionDir, setManiPositionDir] = useState("Left");
   const [maniPositionOrient, setManiPositionOrient] = useState("Posterior");
   const [maniProlongedLabor, setManiProlongedLabor] = useState(false);
@@ -47,8 +47,8 @@ export default function IntrapartumApp() {
     const binaryPosition =
       formattedPosition === "ROP" || formattedPosition === "LOP" ? 1 : 0;
 
-    // Caput is binary: 1 if >= 10mm, 0 otherwise
-    const caputBinary = maniCaput >= 10 ? 1 : 0;
+    // Caput is binary: directly from toggle
+    const caputBinary = maniCaput ? 1 : 0;
 
     const prob = ManipalModel.predictRisk({
       maternalBmi: maniMaternalBmi,
