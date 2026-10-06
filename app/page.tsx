@@ -86,7 +86,7 @@ export default function IntrapartumApp() {
             <h1
               className={`${openSansCondensed.className} text-3xl font-bold text-[#1D1936] mx-auto`}
             >
-              INTRAPARTUM AI
+              INTRAPARTUM TOOL
             </h1>
           </div>
         </div>

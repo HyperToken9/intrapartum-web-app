@@ -209,8 +209,8 @@ export function ManipalForm({
 
           <div className="flex flex-col">
             <FormLabel
-              label="Is Caput >10mm"
-              info={["Whether caput succedaneum (swelling on baby's head) exceeds 10mm."]}
+              label="Caput"
+              info={["Whether caput succedaneum (swelling on baby's head) is present."]}
             />
             <div className="flex h-12 gap-4">
               <button
@@ -233,9 +233,7 @@ export function ManipalForm({
           <div className="flex flex-col">
             <FormLabel
               label="Prolonged Labour"
-              info={[
-                "Labor lasting longer than usual (>20h first-time, >14h others).",
-              ]}
+              info={[]}
             />
             <div className="flex h-12 gap-4">
               <button

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Intrapartum AI",
+  title: "Intrapartum Tool",
   description: "Assessment tool for probability of vaginal birth",
 };
 
