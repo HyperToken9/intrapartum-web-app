@@ -233,7 +233,7 @@ export function ManipalForm({
           <div className="flex flex-col">
             <FormLabel
               label="Prolonged Labour"
-              info={[]}
+              info={["Cervical dilatation <1 cm/hour over ≥4 hours"]}
             />
             <div className="flex h-12 gap-4">
               <button
